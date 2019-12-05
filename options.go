@@ -41,9 +41,9 @@ func (opts *Options) setBinaryContentTypeMap() {
 			b = ctParts[1]
 		}
 		if _, exists := types[a]; exists != true {
-			types[a] = {}
-	}
-		types[ctParts[0]][ctParts[1]] = true
+			types[a] = map[string]bool{}
+		}
+		types[a][b] = true
 	}
 	opts.binaryContentTypeMap = types
 }
