@@ -2,12 +2,13 @@ package algnhsa
 
 import (
 	"encoding/base64"
-	"net/http/httptest"
 	"fmt"
+	"net/http/httptest"
 	"os"
+	"strings"
 )
 
-const acceptAllContentType = "*/*"
+const allContentType = "*"
 
 type lambdaResponse struct {
 	StatusCode        int                 `json:"statusCode"`
@@ -17,7 +18,7 @@ type lambdaResponse struct {
 	IsBase64Encoded   bool                `json:"isBase64Encoded,omitempty"`
 }
 
-func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[string]bool) (lambdaResponse, error) {
+func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[string]map[string]bool) (lambdaResponse, error) {
 	event := lambdaResponse{}
 
 	// Set status code.
@@ -27,9 +28,13 @@ func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[stri
 	event.MultiValueHeaders = w.Result().Header
 
 	// Set body.
-	contentType := w.Header().Get("Content-Type")
-	fmt.Fprintf(os.Stderr, "Content-Type: %s\n", contentType)
-	if binaryContentTypes[acceptAllContentType] || binaryContentTypes[contentType] {
+	fullContentType := w.Header().Get("Content-Type")
+	ctParts := strings.Split(fullContentType, "/")
+	contentType := ctParts[0]
+	contentSubType := ctParts[1]
+
+	fmt.Fprintf(os.Stderr, "Content-Type: %s (%s, %s)\n", fullContentType, contentType, contentSubType)
+	if binaryContentTypes[allContentType][allContentType] || binaryContentTypes[contentType][allContentType] || binaryContentTypes[contentType][contentSubType] {
 		fmt.Fprintf(os.Stderr, "binary file\n")
 		event.Body = base64.RawStdEncoding.EncodeToString(w.Body.Bytes())
 		event.IsBase64Encoded = true

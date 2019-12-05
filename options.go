@@ -1,5 +1,9 @@
 package algnhsa
 
+import (
+	"strings"
+)
+
 type RequestType int
 
 const (
@@ -17,7 +21,7 @@ type Options struct {
 	// BinaryContentTypes sets content types that should be treated as binary types.
 	// The "*/* value makes algnhsa treat any content type as binary.
 	BinaryContentTypes   []string
-	binaryContentTypeMap map[string]bool
+	binaryContentTypeMap map[string]map[string]bool
 
 	// Use API Gateway PathParameters["proxy"] when constructing the request url.
 	// Strips the base path mapping when using a custom domain with API Gateway.
@@ -25,9 +29,14 @@ type Options struct {
 }
 
 func (opts *Options) setBinaryContentTypeMap() {
-	types := map[string]bool{}
-	for _, contentType := range opts.BinaryContentTypes {
-		types[contentType] = true
+	types := map[string]map[string]bool{}
+	for _, fullContentType := range opts.BinaryContentTypes {
+		ctParts := strings.Split(fullContentType, "/")
+		if len(ctParts) != 2 {
+			types[fullContentType]["*"] = true
+		} else {
+			types[ctParts[0]][ctParts[1]] = true
+		}
 	}
 	opts.binaryContentTypeMap = types
 }
