@@ -3,6 +3,8 @@ package algnhsa
 import (
 	"encoding/base64"
 	"net/http/httptest"
+	"fmt"
+	"os"
 )
 
 const acceptAllContentType = "*/*"
