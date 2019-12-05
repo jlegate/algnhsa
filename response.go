@@ -46,7 +46,7 @@ func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[stri
 		event.IsBase64Encoded = false
 	} else {
 		fmt.Fprintf(os.Stderr, "binary file\n")
-		output = base64.RawStdEncoding.EncodeToString(bb)
+		output = base64.StdEncoding.EncodeToString(bb)
 		event.IsBase64Encoded = true
 	}
 
@@ -59,7 +59,7 @@ func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[stri
 	// 	fmt.Fprintf(os.Stderr, "%+v\n", binaryContentTypes)
 	// 	event.Body = w.Body.String()
 	// }
-
+	fmt.Fprintf(os.Stderr, "%+v\n", event)
 	event.Body = output
 
 	return event, nil
