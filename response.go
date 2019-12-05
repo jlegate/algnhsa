@@ -40,6 +40,8 @@ func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[stri
 
 	bb := w.Body.Bytes()
 
+	fmt.Fprintf(os.Stderr, "Bytes: %+v\n", string(bb))
+
 	if utf8.Valid(bb) {
 		fmt.Fprintf(os.Stderr, "non-binary file\n")
 		output = string(bb)
