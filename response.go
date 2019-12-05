@@ -28,12 +28,14 @@ func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[stri
 
 	// Set body.
 	contentType := w.Header().Get("Content-Type")
+	fmt.Fprintf(os.Stderr, "Content-Type: %s\n", contentType)
 	if binaryContentTypes[acceptAllContentType] || binaryContentTypes[contentType] {
 		fmt.Fprintf(os.Stderr, "binary file\n")
 		event.Body = base64.RawStdEncoding.EncodeToString(w.Body.Bytes())
 		event.IsBase64Encoded = true
 	} else {
 		fmt.Fprintf(os.Stderr, "non-binary file\n")
+		fmt.Fprintf(os.Stderr, "%+v\n", binaryContentTypes)
 		event.Body = w.Body.String()
 	}
 
