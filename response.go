@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"strings"
+	"utf8"
 )
 
 const allContentType = "*"
