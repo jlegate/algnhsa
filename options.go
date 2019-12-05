@@ -29,14 +29,21 @@ type Options struct {
 }
 
 func (opts *Options) setBinaryContentTypeMap() {
-	types := map[string]map[string]bool{}
+	var types = make(map[string]map[string]bool)
 	for _, fullContentType := range opts.BinaryContentTypes {
 		ctParts := strings.Split(fullContentType, "/")
+		var a, b string
 		if len(ctParts) != 2 {
-			types[fullContentType]["*"] = true
+			a = fullContentType
+			b = "*"
 		} else {
-			types[ctParts[0]][ctParts[1]] = true
+			a = ctParts[0]
+			b = ctParts[1]
 		}
+		if _, exists := types[a]; exists != true {
+			types[a] = {}
+	}
+		types[ctParts[0]][ctParts[1]] = true
 	}
 	opts.binaryContentTypeMap = types
 }
