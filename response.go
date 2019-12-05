@@ -15,8 +15,8 @@ type lambdaResponse struct {
 	StatusCode        int                 `json:"statusCode"`
 	Headers           map[string]string   `json:"headers"`
 	MultiValueHeaders map[string][]string `json:"multiValueHeaders"`
-	Body              string              `json:"body"`
 	IsBase64Encoded   bool                `json:"isBase64Encoded,omitempty"`
+	Body              string              `json:"body"`
 }
 
 func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[string]map[string]bool) (lambdaResponse, error) {
