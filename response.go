@@ -30,7 +30,9 @@ func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[stri
 
 	// Set body.
 	fullContentType := w.Header().Get("Content-Type")
+	fmt.Fprintf(os.Stderr, "fullContentType: %s\n", fullContentType)
 	ctParts := strings.Split(fullContentType, "/")
+	fmt.Fprintf(os.Stderr, "%#v\n", ctParts)
 	contentType := ctParts[0]
 	contentSubType := ctParts[1]
 
@@ -39,29 +41,20 @@ func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[stri
 	var output string
 
 	bb := w.Body.Bytes()
+	forceBinary := false
 
-	fmt.Fprintf(os.Stderr, "Bytes: %+v\n", string(bb))
+	if binaryContentTypes[allContentType][allContentType] || binaryContentTypes[contentType][allContentType] || binaryContentTypes[contentType][contentSubType] {
+		forceBinary = true
+	}
 
-	if utf8.Valid(bb) {
-		fmt.Fprintf(os.Stderr, "non-binary file\n")
+	if utf8.Valid(bb) || !forceBinary {
 		output = string(bb)
 		event.IsBase64Encoded = false
 	} else {
-		fmt.Fprintf(os.Stderr, "binary file\n")
 		output = base64.StdEncoding.EncodeToString(bb)
 		event.IsBase64Encoded = true
 	}
 
-	// if binaryContentTypes[allContentType][allContentType] || binaryContentTypes[contentType][allContentType] || binaryContentTypes[contentType][contentSubType] {
-	// 	fmt.Fprintf(os.Stderr, "binary file\n")
-	// 	event.Body = base64.RawStdEncoding.EncodeToString(w.Body.Bytes())
-	// 	event.IsBase64Encoded = true
-	// } else {
-	// 	fmt.Fprintf(os.Stderr, "non-binary file\n")
-	// 	fmt.Fprintf(os.Stderr, "%+v\n", binaryContentTypes)
-	// 	event.Body = w.Body.String()
-	// }
-	fmt.Fprintf(os.Stderr, "%+v\n", event)
 	event.Body = output
 
 	return event, nil
