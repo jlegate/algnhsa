@@ -35,9 +35,7 @@ func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[stri
 	if fullContentType == "" {
 		fullContentType = http.DetectContentType(bb)
 	}
-	fmt.Fprintf(os.Stderr, "fullContentType: %s\n", fullContentType)
-	ctParts := strings.Split(fullContentType, "/")
-	fmt.Fprintf(os.Stderr, "%#v\n", ctParts)
+	ctParts := strings.Split(strings.Split(fullContentType, ";")[0], "/")
 	contentType := ctParts[0]
 	contentSubType := ctParts[1]
 
