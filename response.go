@@ -27,9 +27,13 @@ func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[stri
 
 	// Set headers.
 	event.MultiValueHeaders = w.Result().Header
+	bb := w.Body.Bytes()
 
 	// Set body.
 	fullContentType := w.Header().Get("Content-Type")
+	if fullContentType == "" {
+		fullContentType = http.DetectContentType(bb)
+	}
 	fmt.Fprintf(os.Stderr, "fullContentType: %s\n", fullContentType)
 	ctParts := strings.Split(fullContentType, "/")
 	fmt.Fprintf(os.Stderr, "%#v\n", ctParts)
@@ -40,7 +44,6 @@ func newLambdaResponse(w *httptest.ResponseRecorder, binaryContentTypes map[stri
 
 	var output string
 
-	bb := w.Body.Bytes()
 	forceBinary := false
 
 	if binaryContentTypes[allContentType][allContentType] || binaryContentTypes[contentType][allContentType] || binaryContentTypes[contentType][contentSubType] {
